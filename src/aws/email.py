@@ -5,9 +5,12 @@ from boto3 import Session
 
 
 class Email:
-    def __init__(self, session: Session):
+    __DEFAULT_REGION = "us-east-1"
+
+    def __init__(self, session: Session, region_name: str = None):
         self.__session = session
-        self._email_client = self.__session.client("ses")
+        region_name = region_name if region_name is not None else self.__DEFAULT_REGION
+        self._email_client = self.__session.client("ses", region_name=region_name)
 
     def send_email_without_template(
         self,

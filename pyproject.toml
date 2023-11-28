@@ -1,6 +1,14 @@
 [project]
 name = "poprox-utils"
+description = "All utility functions for Poprox project"
 dynamic = ["dependencies", "optional-dependencies"]
+requires-python = ">=3.8"
+version = "0.1a"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
@@ -10,9 +18,9 @@ dev = { file = ["requirements-dev.txt"] }
 
 [tool.pylint.messages_control]
 disable = [
-  "missing-module-docstring",
-  "missing-function-docstring",
-  "missing-class-docstring",
-  "line-too-long",
-  "too-few-public-methods",
+    "missing-module-docstring",
+    "missing-function-docstring",
+    "missing-class-docstring",
+    "line-too-long",
+    "too-few-public-methods",
 ]
