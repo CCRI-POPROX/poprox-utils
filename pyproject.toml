@@ -16,11 +16,14 @@ dependencies = { file = ["requirements.txt"] }
 [tool.setuptools.dynamic.optional-dependencies]
 dev = { file = ["requirements-dev.txt"] }
 
+[tool.ruff]
+line-length = 100
+
 [tool.pylint.messages_control]
 disable = [
-    "missing-module-docstring",
-    "missing-function-docstring",
-    "missing-class-docstring",
-    "line-too-long",
-    "too-few-public-methods",
+  "missing-module-docstring",
+  "missing-function-docstring",
+  "missing-class-docstring",
+  "line-too-long",
+  "too-few-public-methods",
 ]
