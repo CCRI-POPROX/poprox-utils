@@ -2,8 +2,8 @@ import unittest
 
 from localstack_client.session import Session
 
-from src.aws import Email
-from src.exceptions import PoproxAwsUtilitiesException
+from poprox_utils.aws import Email
+from poprox_utils.exceptions import PoproxAwsUtilitiesException
 
 
 class TestEmail(unittest.TestCase):
@@ -22,10 +22,7 @@ class TestEmail(unittest.TestCase):
 
         # Ensure the template was created
         self.assertTrue(
-            any(
-                template["Name"] == template_name
-                for template in self.email.list_templates()
-            )
+            any(template["Name"] == template_name for template in self.email.list_templates())
         )
 
     def test_update_email_template(self):

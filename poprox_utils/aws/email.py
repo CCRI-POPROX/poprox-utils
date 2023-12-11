@@ -54,16 +54,12 @@ class Email:
     def list_templates(self, max_items: int = None):
         templates = []
         if max_items is not None:
-            return self._email_client.list_templates(MaxItems=max_items)[
-                "TemplatesMetadata"
-            ]
+            return self._email_client.list_templates(MaxItems=max_items)["TemplatesMetadata"]
 
         response = self._email_client.list_templates()
         templates.extend(response["TemplatesMetadata"])
         while "NextToken" in response:
-            response = self._email_client.list_templates(
-                NextToken=response["NextToken"]
-            )
+            response = self._email_client.list_templates(NextToken=response["NextToken"])
             templates.extend(response["TemplatesMetadata"])
         return templates
 
@@ -114,9 +110,7 @@ class Email:
             response = self._email_client.get_template(TemplateName=template_name)
             return response["Template"]
         except self._email_client.exceptions.TemplateDoesNotExistException as error:
-            raise PoproxAwsUtilitiesException(
-                f"Template {template_name} not found"
-            ) from error
+            raise PoproxAwsUtilitiesException(f"Template {template_name} not found") from error
 
     def send_email_with_template(
         self,
