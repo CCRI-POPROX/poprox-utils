@@ -2,7 +2,7 @@
 name = "poprox-utils"
 description = "All utility functions for Poprox project"
 dynamic = ["dependencies", "optional-dependencies"]
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 version = "0.1a"
 
 [build-system]
