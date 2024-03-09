@@ -1,4 +1,4 @@
 from .auth import Auth
-from .email import Email
+from .ses import Email
 
 __all__ = ["Auth", "Email"]
