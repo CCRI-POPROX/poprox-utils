@@ -1,5 +1,5 @@
 import json
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Optional
 
 import boto3
 from botocore import exceptions
@@ -9,7 +9,7 @@ from ..exceptions import PoproxAwsUtilitiesException
 class Email:
     __DEFAULT_REGION = "us-east-1"
 
-    def __init__(self, session: boto3.Session, region_name: str = None):
+    def __init__(self, session: boto3.Session, region_name: Optional[str] = None):
         self.__session = session
         region_name = region_name if region_name is not None else self.__DEFAULT_REGION
         self._email_client = self.__session.client("ses", region_name=region_name)
@@ -27,7 +27,7 @@ class Email:
         try:
             return self._email_client.send_email(
                 Source=email_from,
-                Destination={"ToAddresses": [email_to]},
+                Destination={"ToAddresses": email_to},
                 Message={
                     "Subject": {"Data": subject},
                     "Body": {"Html": {"Charset": "UTF-8", "Data": body_html}},
@@ -51,7 +51,7 @@ class Email:
 
             raise error
 
-    def list_templates(self, max_items: int = None):
+    def list_templates(self, max_items: Optional[int] = None):
         templates = []
         if max_items is not None:
             return self._email_client.list_templates(MaxItems=max_items)["TemplatesMetadata"]
