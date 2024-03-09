@@ -2,14 +2,14 @@ import unittest
 
 from localstack_client.session import Session
 
-from poprox_utils.aws import Email
+from poprox_utils.aws import ses
 from poprox_utils.exceptions import PoproxAwsUtilitiesException
 
 
 class TestEmail(unittest.TestCase):
     def setUp(self):
         self.session = Session()
-        self.email = Email(self.session)
+        self.email = ses.Email(self.session)
 
     def test_create_email_template(self):
         template_name = "test"
