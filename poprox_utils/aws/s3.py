@@ -47,3 +47,12 @@ class S3:
             next_token = response.get("NextContinuationToken")
             if next_token is None:
                 return objects
+
+    def put_object(self, bucket_name: str, key: str, body: bytes) -> Dict:
+        """Put the object in the bucket"""
+        try:
+            return self.s3_client.put_object(Bucket=bucket_name, Key=key, Body=body)
+        except exceptions.ClientError as e:
+            raise PoproxAwsUtilitiesException(
+                f"Error putting object {key} in {bucket_name}: {e}"
+            ) from e

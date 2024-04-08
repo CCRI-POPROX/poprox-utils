@@ -1,5 +1,7 @@
+import base64
 import json
 from typing import Union, List, Dict, Optional
+from bs4 import BeautifulSoup
 
 import boto3
 from botocore import exceptions
@@ -14,17 +16,77 @@ class Email:
         region_name = region_name if region_name is not None else self.__DEFAULT_REGION
         self._email_client = self.__session.client("ses", region_name=region_name)
 
+    @staticmethod
+    def replace_url_to_add_tracking(
+        html: str, base_tracking_url: str, parameters: Optional[Dict]
+    ) -> str:
+        if base_tracking_url is None:
+            raise PoproxAwsUtilitiesException("base_tracking_url must be provided")
+
+        if base_tracking_url.endswith("/"):
+            base_tracking_url = base_tracking_url[:-1]
+
+        if parameters is None:
+            parameters = {}
+        soup = BeautifulSoup(html, "html.parser")
+        for a in soup.findAll("a", href=True):
+            current_parameters = parameters.copy()
+            current_parameters.update({"url": a["href"]})
+            a["href"] = (
+                f"{base_tracking_url}/"
+                f"{base64.urlsafe_b64encode(json.dumps(current_parameters).encode('utf-8')).decode('utf-8')}"
+            )
+
+        return str(soup)
+
+    @staticmethod
+    def extract_parameters_from_url(url: str, base_tracking_url: str) -> Dict:
+        if base_tracking_url is None:
+            raise PoproxAwsUtilitiesException("base_tracking_url must be provided")
+
+        if not base_tracking_url.endswith("/"):
+            base_tracking_url = base_tracking_url + "/"
+
+        encoded = url.replace(base_tracking_url, "")
+
+        return json.loads(base64.urlsafe_b64decode(encoded.encode("utf-8")).decode("utf-8"))
+
+    # pylint: disable=too-many-arguments
     def send_email_without_template(
         self,
         email_from: str,
         email_to: Union[str, List[str]],
         subject: str,
         body_html: str,
+        track_links: bool = False,
+        base_tracking_url: Optional[str] = None,
+        parameters: Optional[Dict] = None,
     ):
+        """
+        Send email without template
+        :param email_from:
+        :param email_to:
+        :param subject:
+        :param body_html:
+        :param track_links:
+        :param base_tracking_url: has to be provided if track_links is True
+        :param parameters: Ensure parameters don't contain the key 'url'
+        :return:
+        """
         if not isinstance(email_to, list):
             email_to = [email_to]
 
+        if base_tracking_url is None and track_links:
+            raise PoproxAwsUtilitiesException(
+                "base_tracking_url must be provided if track_links is True"
+            )
+
         try:
+            if track_links:
+                body_html = self.replace_url_to_add_tracking(
+                    body_html, base_tracking_url, parameters
+                )
+
             return self._email_client.send_email(
                 Source=email_from,
                 Destination={"ToAddresses": email_to},
