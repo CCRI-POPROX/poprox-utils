@@ -32,12 +32,17 @@ class Email:
         for a in soup.findAll("a", href=True):
             current_parameters = parameters.copy()
             current_parameters.update({"url": a["href"]})
-            a["href"] = (
-                f"{base_tracking_url}/"
-                f"{base64.urlsafe_b64encode(json.dumps(current_parameters).encode('utf-8')).decode('utf-8')}"
-            )
+            a["href"] = f"{base_tracking_url}/" f"{Email.encode_decoded_data(current_parameters)}"
 
         return str(soup)
+
+    @staticmethod
+    def encode_decoded_data(decoded: dict) -> str:
+        return base64.urlsafe_b64encode(json.dumps(decoded).encode("utf-8")).decode("utf-8")
+
+    @staticmethod
+    def decode_encoded_data(encoded: str) -> dict:
+        return json.loads(base64.urlsafe_b64decode(encoded.encode("utf-8")).decode("utf-8"))
 
     @staticmethod
     def extract_parameters_from_url(url: str, base_tracking_url: str) -> Dict:
@@ -49,7 +54,7 @@ class Email:
 
         encoded = url.replace(base_tracking_url, "")
 
-        return json.loads(base64.urlsafe_b64decode(encoded.encode("utf-8")).decode("utf-8"))
+        return Email.decode_encoded_data(encoded)
 
     # pylint: disable=too-many-arguments
     def send_email_without_template(
